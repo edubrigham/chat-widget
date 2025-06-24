@@ -19,23 +19,26 @@
             width: 350px;
             max-width: 90%;
             height: 500px;
-            background: #fff;
-            border-radius: 10px;
+            background: #000000;
+            border-radius: 16px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            font-family: Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             z-index: 9999;
+            border: 1px solid #38444d;
+            color: #ffffff;
         }
 
         #chat-header {
-            background: #4a4a4a;
+            background: #000000;
             color: white;
             padding: 15px;
             text-align: center;
-            font-size: 1.1em;
+            font-size: 1.2em;
             font-weight: bold;
+            border-bottom: 1px solid #38444d;
         }
 
         #chat-messages {
@@ -45,6 +48,7 @@
             display: flex;
             flex-direction: column;
             gap: 15px;
+            background-color: #000000;
         }
 
         .message {
@@ -52,18 +56,19 @@
             border-radius: 18px;
             max-width: 80%;
             line-height: 1.4;
-            color: #333;
+            color: #ffffff;
         }
 
         .user-message {
-            background: #007bff;
+            background: #1D9BF0;
             color: white;
             align-self: flex-end;
             border-bottom-right-radius: 4px;
         }
 
         .bot-message {
-            background: #e9e9eb;
+            background: #2f3336;
+            color: white;
             align-self: flex-start;
             border-bottom-left-radius: 4px;
         }
@@ -92,37 +97,43 @@
 
         #chat-input-container {
             display: flex;
+            align-items: center;
             padding: 10px;
-            border-top: 1px solid #eee;
+            border-top: 1px solid #38444d;
         }
 
         #chat-input {
             flex-grow: 1;
-            border: 1px solid #ddd;
-            padding: 10px;
+            border: none;
+            padding: 10px 15px;
             font-size: 1em;
             border-radius: 20px;
             margin-right: 10px;
+            background-color: #2f3336;
+            color: white;
         }
 
         #chat-input:focus {
             outline: none;
-            border-color: #007bff;
         }
 
         #send-btn {
-            background: #007bff;
+            background: #1D9BF0;
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
             cursor: pointer;
-            font-size: 1em;
+            font-size: 1.5em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             transition: background-color 0.2s;
         }
 
         #send-btn:hover {
-            background: #0056b3;
+            background: #1a8cd8;
         }
     `;
 
@@ -130,14 +141,14 @@
     const widgetHtml = `
         <div id="chat-widget-container">
             <div id="chat-header">
-                <span>Chat with our AI</span>
+                <span>Messages</span>
             </div>
             <div id="chat-messages" aria-live="polite">
                  <div class="message bot-message">Hello! How can I help you today?</div>
             </div>
             <div id="chat-input-container">
-                <input type="text" id="chat-input" placeholder="Type your message..." aria-label="Chat input">
-                <button id="send-btn" aria-label="Send message">Send</button>
+                <input type="text" id="chat-input" placeholder="Start a new message" aria-label="Chat input">
+                <button id="send-btn" aria-label="Send message">&#10148;</button>
             </div>
         </div>
     `;
