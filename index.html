@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Widget Demo</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .content {
+            text-align: center;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="content">
+        <h1>Chat Widget Demo Page</h1>
+        <p>The chat widget should appear at the bottom-right of this page.</p>
+        <p>This is a demonstration of how to include the self-contained chat widget script.</p>
+    </div>
+
+    <!-- 
+      Add the chat widget to your site with this single script tag.
+      1. Replace the src attribute with the path to your hosted chat-widget.js file.
+      2. Replace the data-webhook-url with your actual n8n webhook URL.
+    -->
+    <script src="chat-widget.js" 
+            data-webhook-url="YOUR_N8N_WEBHOOK_URL" 
+            defer>
+    </script>
+
+</body>
+</html> 
