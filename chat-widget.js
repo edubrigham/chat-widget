@@ -12,43 +12,78 @@
 
     // 1. CSS styles for the chat widget
     const styles = `
+        :root {
+            --widget-height-collapsed: 60px;
+            --widget-height-expanded: 500px;
+        }
+
         #chat-widget-container {
             position: fixed;
-            bottom: 20px;
+            bottom: 0;
             right: 20px;
             width: 350px;
             max-width: 90%;
-            height: 500px;
-            background: #000000;
-            border-radius: 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            height: var(--widget-height-collapsed);
+            background: #ffffff;
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+            box-shadow: 0 -2px 12px rgba(0,0,0,0.1);
             display: flex;
             flex-direction: column;
             overflow: hidden;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             z-index: 9999;
-            border: 1px solid #38444d;
-            color: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-bottom: none;
+            color: #0F1419;
+            transition: height 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        #chat-widget-container.is-open {
+            height: var(--widget-height-expanded);
         }
 
         #chat-header {
-            background: #000000;
-            color: white;
-            padding: 15px;
-            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            background: #ffffff;
+            color: #0F1419;
             font-size: 1.2em;
             font-weight: bold;
-            border-bottom: 1px solid #38444d;
+            cursor: pointer;
+            min-height: var(--widget-height-collapsed);
+        }
+        
+        #chat-header-icons {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        #chat-header-icons svg {
+            width: 24px;
+            height: 24px;
+            fill: #0F1419;
+        }
+        
+        #toggle-widget-icon {
+            transition: transform 0.3s;
+        }
+
+        #chat-widget-container.is-open #toggle-widget-icon {
+            transform: rotate(180deg);
         }
 
         #chat-messages {
             flex-grow: 1;
-            padding: 20px;
+            padding: 0 20px 20px 20px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
             gap: 15px;
-            background-color: #000000;
+            background-color: #ffffff;
         }
 
         .message {
@@ -56,7 +91,6 @@
             border-radius: 18px;
             max-width: 80%;
             line-height: 1.4;
-            color: #ffffff;
         }
 
         .user-message {
@@ -67,8 +101,8 @@
         }
 
         .bot-message {
-            background: #2f3336;
-            color: white;
+            background: #f0f0f0;
+            color: #0F1419;
             align-self: flex-start;
             border-bottom-left-radius: 4px;
         }
@@ -98,8 +132,8 @@
         #chat-input-container {
             display: flex;
             align-items: center;
-            padding: 10px;
-            border-top: 1px solid #38444d;
+            padding: 10px 20px;
+            border-top: 1px solid #e0e0e0;
         }
 
         #chat-input {
@@ -109,8 +143,8 @@
             font-size: 1em;
             border-radius: 20px;
             margin-right: 10px;
-            background-color: #2f3336;
-            color: white;
+            background-color: #f0f0f0;
+            color: #0F1419;
         }
 
         #chat-input:focus {
@@ -141,10 +175,18 @@
     const widgetHtml = `
         <div id="chat-widget-container">
             <div id="chat-header">
-                <span>Messages</span>
+                <span id="chat-widget-title">Messages</span>
+                <div id="chat-header-icons">
+                     <svg viewBox="0 0 24 24">
+                        <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 12H5V5h14v9z"></path>
+                    </svg>
+                    <svg id="toggle-widget-icon" viewBox="0 0 24 24">
+                        <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path>
+                    </svg>
+                </div>
             </div>
             <div id="chat-messages" aria-live="polite">
-                 <div class="message bot-message">Hello! How can I help you today?</div>
+                 <div id="welcome-message" class="message bot-message">Hello! How can I help you today?</div>
             </div>
             <div id="chat-input-container">
                 <input type="text" id="chat-input" placeholder="Start a new message" aria-label="Chat input">
@@ -161,17 +203,40 @@
         document.head.appendChild(styleElement);
 
         // Inject HTML
-        const widgetContainer = document.createElement('div');
-        widgetContainer.innerHTML = widgetHtml;
-        document.body.appendChild(widgetContainer);
+        document.body.insertAdjacentHTML('beforeend', widgetHtml);
         
         // --- All the chat logic from before goes here ---
+        const widgetContainer = document.getElementById('chat-widget-container');
+        const chatHeader = document.getElementById('chat-header');
         const chatMessages = document.getElementById('chat-messages');
         const chatInput = document.getElementById('chat-input');
         const sendBtn = document.getElementById('send-btn');
         const sessionId = Date.now().toString(36) + Math.random().toString(36).substring(2);
 
+        const fetchWidgetConfig = async () => {
+            try {
+                const response = await fetch(n8nWebhookUrl, { method: 'GET' });
+                if (!response.ok) throw new Error('Failed to fetch config');
+                const config = await response.json();
+                
+                const titleElement = document.getElementById('chat-widget-title');
+                const welcomeMessageElement = document.getElementById('welcome-message');
+
+                if (config.title) {
+                    titleElement.innerText = config.title;
+                }
+                if (config.welcomeMessage) {
+                    welcomeMessageElement.innerText = config.welcomeMessage;
+                }
+            } catch (error) {
+                console.error('Chat Widget Error: Could not fetch initial configuration.', error);
+            }
+        };
+
         const appendMessage = (text, sender) => {
+            const welcomeMessage = document.getElementById('welcome-message');
+            if(welcomeMessage) welcomeMessage.remove();
+
             const messageElement = document.createElement('div');
             messageElement.classList.add('message', `${sender}-message`);
             messageElement.textContent = text;
@@ -226,6 +291,13 @@
         chatInput.addEventListener('keydown', (event) => {
             if (event.key === 'Enter') sendMessage();
         });
+
+        // Toggle widget visibility
+        chatHeader.addEventListener('click', () => {
+            widgetContainer.classList.toggle('is-open');
+        });
+
+        fetchWidgetConfig();
     }
 
     // Wait for the DOM to be fully loaded before initializing the widget
