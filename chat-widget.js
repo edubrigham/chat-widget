@@ -44,8 +44,9 @@
         }
 
         #chat-header {
+            position: relative;
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
             padding: 0 20px;
             background: #ffffff;
@@ -57,6 +58,8 @@
         }
         
         #chat-header-icons {
+            position: absolute;
+            right: 20px;
             display: flex;
             align-items: center;
             gap: 16px;
@@ -78,6 +81,7 @@
 
         #chat-messages {
             flex-grow: 1;
+            min-height: 0;
             padding: 0 20px 20px 20px;
             overflow-y: auto;
             display: flex;
@@ -227,6 +231,9 @@
                 }
                 if (config.welcomeMessage) {
                     welcomeMessageElement.innerText = config.welcomeMessage;
+                }
+                if (config.titleColor) {
+                    titleElement.style.color = config.titleColor;
                 }
             } catch (error) {
                 console.error('Chat Widget Error: Could not fetch initial configuration.', error);
